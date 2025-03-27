@@ -1,5 +1,5 @@
 import { ChangeEvent, FormEvent, useState } from "react";
-import { BaseField } from "./Field";
+import { EmailField } from "./EmailField";
 import { mergeStyleSets } from "@fluentui/react";
 import { BaseButton } from "./Button";
 
@@ -7,7 +7,12 @@ const css = mergeStyleSets({
     form: {
     },
     content: {
-        display: "flex"
+        //  display: "flex"
+        width: 250
+    },
+    submit: {
+        textAlign: "end",
+        paddingTop: "20px"
     }
 });
 
@@ -26,8 +31,8 @@ export default function EmailForm() {
         <form onSubmit={handleSubmit} className={css.form}>
             <div className={css.content}>
 
-                <BaseField />
-                <div>
+                <EmailField />
+                <div className={css.submit}>
                     <BaseButton>Odeslat</BaseButton>
                 </div>
             </div>

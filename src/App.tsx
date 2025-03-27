@@ -2,7 +2,6 @@ import React from 'react';
 import connection from './eWayAPI/Connector';
 import { TContactsResopnse } from './eWayAPI/ContactsResponse';
 import { mergeStyleSets, Dialog, DialogType, DialogFooter, PrimaryButton, ProgressIndicator } from '@fluentui/react';
-import { BaseField } from './components/Field';
 import EmailForm from './components/Form';
 
 const css = mergeStyleSets({
