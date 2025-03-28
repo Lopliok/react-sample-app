@@ -1,9 +1,11 @@
-import { ChangeEvent, FormEvent, useState } from 'react';
-import { EmailField } from './EmailField';
 import { mergeStyleSets } from '@fluentui/react';
-import { BaseButton } from './Button';
+import { ToastIntent, useToastController } from '@fluentui/react-components';
+import { FormEvent } from 'react';
 import connection from '../eWayAPI/Connector';
-import { TContactsResponse } from '../eWayAPI/ContactsResponse';
+import { TContact, TContactsResponse } from '../eWayAPI/ContactsResponse';
+import { BaseButton } from './Button';
+import { EmailField } from './EmailField';
+import { ToastComponent } from './Toast';
 
 const css = mergeStyleSets({
   form: {},
@@ -18,10 +20,17 @@ const css = mergeStyleSets({
 });
 
 type Props = {
-  setEmail: (value: string) => void;
+  setData: (value: TContact) => void;
+  toasterId?: string;
 };
 
-export default function EmailForm({ setEmail }: Props) {
+export default function EmailForm({ setData, toasterId }: Props) {
+  const { dispatchToast } = useToastController(toasterId);
+  const notify = (title: string, description: string, toastIntent: ToastIntent) =>
+    dispatchToast(<ToastComponent title={title} description={description} />, {
+      intent: toastIntent,
+    });
+
   const searchContact = (email: string) => {
     connection.callMethod(
       'SearchContacts',
@@ -32,7 +41,12 @@ export default function EmailForm({ setEmail }: Props) {
         includeProfilePictures: true,
       },
       (result: TContactsResponse) => {
-        console.log(result);
+        if (result.Data.length === 0) {
+          notify('Kontakt nenalezen!', 'Zadejte jiný email!', 'error');
+        } else {
+          notify('Kontakt nalezen', 'Získány detaily kontaktu.', 'success');
+          setData(result.Data?.[0]);
+        }
       }
     );
   };
@@ -40,13 +54,11 @@ export default function EmailForm({ setEmail }: Props) {
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    const value = formData.get('username') as string;
+    const value = formData.get('email') as string;
 
     if (value) {
       searchContact(value);
     }
-
-    value && setEmail(value);
   };
 
   return (

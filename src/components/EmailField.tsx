@@ -39,7 +39,7 @@ export const EmailField = (props: Partial<FieldProps>) => {
       validationMessage={state && validationMessages[state]}
       {...props}
     >
-      <Input />
+      <Input name="email" value={value} />
     </Field>
   );
 };

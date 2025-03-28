@@ -1,15 +1,9 @@
-import React, { useState } from 'react';
-import connection from './eWayAPI/Connector';
-import { TContactsResponse } from './eWayAPI/ContactsResponse';
-import {
-  mergeStyleSets,
-  Dialog,
-  DialogType,
-  DialogFooter,
-  PrimaryButton,
-  ProgressIndicator,
-} from '@fluentui/react';
+import { mergeStyleSets } from '@fluentui/react';
+import { Toaster, useId } from '@fluentui/react-components';
+import { useState } from 'react';
 import EmailForm from './components/Form';
+import { TContact } from './eWayAPI/ContactsResponse';
+import { ContactCard } from './components/Cards';
 
 const css = mergeStyleSets({
   wrapper: {
@@ -19,40 +13,19 @@ const css = mergeStyleSets({
   },
 });
 
-const dialogContentProps = {
-  type: DialogType.normal,
-  title: 'Agent Data',
-  isDraggable: false,
-};
-
-const modalProps = {
-  isBlocking: true,
-};
-
-// This is a React Hook component.
 const App = () => {
-  const [selectedEmail, setSelectedEmail] = useState<string | undefined>();
+  const toasterId = useId('toaster');
 
-  React.useEffect(() => {
-    setTimeout(() => {
-      connection.callMethod(
-        'SearchContacts',
-        {
-          transmitObject: {
-            Email1Address: 'mroyster@royster.com', // ealbares@gmail.com, oliver@hotmail.com, michael.ostrosky@ostrosky.com, kati.rulapaugh@hotmail.com and many others
-          },
-          includeProfilePictures: true,
-        },
-        (result: TContactsResponse) => {
-          console.log(result);
-        }
-      );
-    }, 5000);
-  });
+  const [loadedData, setLoadedData] = useState<TContact>();
 
   return (
     <div className={css.wrapper}>
-      <EmailForm setEmail={value => setSelectedEmail(value)} />
+      <Toaster toasterId={toasterId} />
+      {!loadedData ? (
+        <EmailForm setData={setLoadedData} toasterId={toasterId} />
+      ) : (
+        <ContactCard data={loadedData} close={() => setLoadedData(undefined)} />
+      )}
     </div>
   );
 };
